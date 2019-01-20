@@ -3,10 +3,9 @@ package com.nikolayzakharevich.games;
 class EpicBattlePlayer extends Player<EpicBattle> {
     private int hp;
 
-    EpicBattlePlayer(String vkId) {
+    EpicBattlePlayer(int vkId) {
         super(vkId);
     }
-
 
     int getHp() {
         return hp;

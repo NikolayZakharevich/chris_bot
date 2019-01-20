@@ -1,13 +1,26 @@
 package com.nikolayzakharevich.games;
 
 abstract class Player<T extends Game> {
-    protected String vkId;
+
+    protected int vkId;
     protected String firstName;
     protected String lastName;
 
-    Player(String vkId) {
+    Player(int vkId) {
         this.vkId = vkId;
+// TODO: 20.01.19
+    }
 
+    public int getVkId() {
+        return vkId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
 }

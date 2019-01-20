@@ -1,7 +1,7 @@
 package com.nikolayzakharevich;
 
 import com.vk.api.sdk.client.VkApiClient;
-import com.vk.api.sdk.client.actors.UserActor;
+import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 
 import org.eclipse.jetty.server.Server;
@@ -22,7 +22,7 @@ public class Main {
 
         Server server = new Server(port);
         server.setHandler(new RequestHandler(new VkApiClient(new HttpTransportClient()),
-                new UserActor(APP_ID, ACCESS_TOKEN)));
+                new GroupActor(APP_ID, ACCESS_TOKEN)));
 
         server.start();
         server.join();

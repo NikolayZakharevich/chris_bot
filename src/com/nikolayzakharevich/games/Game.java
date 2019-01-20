@@ -1,25 +1,45 @@
 package com.nikolayzakharevich.games;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Game {
+abstract class Game {
 
-    final String name;
-    protected List<Player> players;
+    protected final String name;
+    protected List<Player<?>> players = new ArrayList<>();
+    protected List<Player<?>> currentPlayers = new ArrayList<>();
+    protected String keyboard;
+    protected String message;
 
-    public Game(String name) {
+    Game(String name) {
         this.name = name;
+    }
+
+    abstract void init(int initiatorId, int... playerIds);
+
+    abstract void processMessage(String text);
+
+    String getKeyboard() {
+        return keyboard;
+    }
+
+    String getMessage() {
+        return message;
     }
 
     public String getName() {
         return name;
     }
 
-    List<Player> getPlayers() {
+    List<Player<?>> getPlayers() {
         return players;
     }
 
-    public String getPlayerList() {
+    List<Player<?>> getCurrentPlayers() {
+        return currentPlayers;
+    }
+
+    String getPlayerList() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Player player : players) {
             stringBuilder.append(player.firstName)

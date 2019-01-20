@@ -1,6 +1,6 @@
 package com.nikolayzakharevich;
 
-enum Color {
+public enum Color {
     BLUE {
         public String toString() {
             return "primary";

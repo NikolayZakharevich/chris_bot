@@ -1,10 +1,8 @@
 package com.nikolayzakharevich;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.client.actors.UserActor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -28,7 +26,7 @@ public class RequestHandler extends AbstractHandler {
     private final ChatHandler chatHandler;
     private final Gson gson;
 
-    RequestHandler(VkApiClient client, UserActor actor) {
+    RequestHandler(VkApiClient client, GroupActor actor) {
         dialogHandler = new DialogHandler(client, actor);
         chatHandler = new ChatHandler(client, actor);
         this.gson = new GsonBuilder().create();
@@ -60,14 +58,23 @@ public class RequestHandler extends AbstractHandler {
                 case MESSAGE_TYPE:
                     JsonObject object = requestJson.getAsJsonObject("object");
                     int userId = object.getAsJsonPrimitive("from_id").getAsInt();
-                    int chatId = object.getAsJsonPrimitive("peer_id").getAsInt() - CHAT_ID_SHIFT;
-
-                    if (chatId < 0) {
-//                        dialogHandler.sayHi(userId);
-                        dialogHandler.tryKeyboard(userId);
+                    int chatId = object.getAsJsonPrimitive("peer_id").getAsInt();
+                    String text = object.getAsJsonPrimitive("text").getAsString();
+                    BotRequestHandler handler;
+                    if (chatId < CHAT_ID_SHIFT) {
+                        handler = dialogHandler;
                     } else {
-                        chatHandler.sayHi(chatId);
+                        handler = chatHandler;
+                        chatId -= CHAT_ID_SHIFT;
                     }
+
+                    JsonPrimitive payload = object.getAsJsonPrimitive("payload");
+                    if (object.getAsJsonPrimitive("payload") != null) {
+                        handler.processMessage(userId, chatId, text, payload.getAsString());
+                    } else {
+                        handler.processMessage(userId, chatId, text);
+                    }
+
                     responseBody = OK_BODY;
                     break;
                 default:

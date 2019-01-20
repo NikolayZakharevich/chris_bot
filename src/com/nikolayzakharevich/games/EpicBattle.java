@@ -1,12 +1,20 @@
 package com.nikolayzakharevich.games;
 
-import java.util.List;
+import static com.nikolayzakharevich.games.GameConstants.*;
 
-public class EpicBattle extends Game {
+class EpicBattle extends Game {
 
     EpicBattle() {
-        super("Эпические битвы рандомной магии");
+        super(EPIC_BATTLE_NAME);
     }
 
+    @Override
+    void init(int initiatorId, int... playerIds) {
 
+    }
+
+    @Override
+    void processMessage(String text) {
+
+    }
 }
