@@ -1,8 +1,9 @@
-package com.nikolayzakharevich;
+package com.nikolayzakharevich.tools;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.nikolayzakharevich.exeptions.KeyboardException;
 
 public class Keyboard {
 

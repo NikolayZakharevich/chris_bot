@@ -1,12 +1,24 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
+
+import com.nikolayzakharevich.games.dao.Dao;
+import com.nikolayzakharevich.games.dao.DaoImplementationChooser;
 
 import java.util.List;
 
-import static com.nikolayzakharevich.games.GameConstants.*;
+import static com.nikolayzakharevich.games.GameConstants.EPIC_BATTLE_NAME;
+import static com.nikolayzakharevich.games.GameConstants.ROCK_PAPER_SCISSORS_NAME;
 
-public class BasicGameClient implements GameClient {
+public class BasicGameService implements GameService {
+
+    private int chatId;
     private Game currentGame;
     private String message;
+    private Dao dao;
+
+    public BasicGameService(int chatId) {
+        this.chatId = chatId;
+        dao = DaoImplementationChooser.getDao();
+    }
 
     @Override
     public void init(String gameName, int userId) {
@@ -35,11 +47,6 @@ public class BasicGameClient implements GameClient {
         }
     }
 
-    private boolean isValidPlayer(int userId) {
-        List<Player<?>> currentPlayers = currentGame.getCurrentPlayers();
-        return currentPlayers.stream().anyMatch(player -> player.getVkId() == userId);
-    }
-
     @Override
     public String getKeyboard() {
         return currentGame.getKeyboard();
@@ -48,5 +55,10 @@ public class BasicGameClient implements GameClient {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    private boolean isValidPlayer(int userId) {
+        List<Player<?>> currentPlayers = currentGame.getCurrentPlayers();
+        return currentPlayers.stream().anyMatch(player -> player.getVkId() == userId);
     }
 }

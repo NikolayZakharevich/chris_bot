@@ -1,4 +1,4 @@
-package com.nikolayzakharevich;
+package com.nikolayzakharevich.tools;
 
 public enum Color {
     BLUE {

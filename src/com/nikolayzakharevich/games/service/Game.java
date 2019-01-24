@@ -1,4 +1,4 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
 
 import java.util.ArrayList;
 import java.util.List;

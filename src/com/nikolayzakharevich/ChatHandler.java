@@ -5,9 +5,11 @@ import static com.nikolayzakharevich.games.GameConstants.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
-import com.nikolayzakharevich.games.BasicGameClient;
-import com.nikolayzakharevich.games.GameClient;
+import com.nikolayzakharevich.games.client.GameClient;
+import com.nikolayzakharevich.games.client.BasicGameClient;
 
+import com.nikolayzakharevich.tools.Color;
+import com.nikolayzakharevich.tools.Keyboard;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -23,11 +25,7 @@ class ChatHandler extends BotRequestHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(BotRequestHandler.class);
 
-    private final static String EPIC_BATTLE_INIT = "{\"init_game\":\"epic_battle\"}";
-    private final static String ROCK_PAPER_SCISSORS_INIT = "{\"init_game\":\"rock_paper_scissors\"}";
-    private final static String ROCK_PAPER_SCISSORS_ACTION = "{\"game_action\":\"rock_paper_scissors\"}";
-
-    private Map<Integer, GameClient> database = new HashMap<>();
+    private GameClient gameClient = new BasicGameClient();
 
     ChatHandler(VkApiClient apiClient, GroupActor actor) {
         super(apiClient, actor);
@@ -75,13 +73,6 @@ class ChatHandler extends BotRequestHandler {
 
     @Override
     void processMessage(int userId, int chatId, String text, String payload) {
-        GameClient gameClient;
-        if (database.containsKey(chatId)) {
-            gameClient = database.get(chatId);
-        } else {
-            gameClient = new BasicGameClient();
-            database.put(chatId, gameClient);
-        }
 
         text = text.substring(text.indexOf(" ") + 1);
         switch (payload) {
@@ -90,19 +81,17 @@ class ChatHandler extends BotRequestHandler {
                 break;
             case ROCK_PAPER_SCISSORS_INIT:
                 LOG.info("Initialization of RockPaperScissors in chat " + chatId);
-                gameClient.init(text, userId);
-                sendKeyboardMessage(chatId, gameClient.getMessage(), gameClient.getKeyboard());
+                gameClient.init(chatId, text, userId);
+                sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
                 break;
             case ROCK_PAPER_SCISSORS_ACTION:
                 LOG.info("Action of RockPaperScissors in chat " + chatId);
-                gameClient.process(text, userId);
-                sendKeyboardMessage(chatId, gameClient.getMessage(), gameClient.getKeyboard());
+                gameClient.process(chatId, text, userId);
+                sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
                 break;
             default:
-                LOG.error("WTF");
                 // TODO: 20.01.19
         }
-
     }
 
     @Override

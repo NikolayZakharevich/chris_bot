@@ -1,6 +1,6 @@
-package com.nikolayzakharevich;
+package com.nikolayzakharevich.exeptions;
 
-class KeyboardException extends RuntimeException {
+public class KeyboardException extends RuntimeException {
     public KeyboardException() {
     }
 

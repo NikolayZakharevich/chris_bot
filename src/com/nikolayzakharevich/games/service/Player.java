@@ -1,4 +1,4 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
 
 abstract class Player<T extends Game> {
 

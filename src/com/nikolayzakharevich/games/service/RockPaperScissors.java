@@ -1,7 +1,7 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
 
-import com.nikolayzakharevich.Color;
-import com.nikolayzakharevich.Keyboard;
+import com.nikolayzakharevich.tools.Color;
+import com.nikolayzakharevich.tools.Keyboard;
 
 import java.util.Random;
 
@@ -77,6 +77,7 @@ class RockPaperScissors extends Game {
 
     private void finalAction() {
         message += "\nИгра окончена";
+        message += "\nПобедитель - " + (player.getWins() == limit ? "Человек" : "Робот");
         keyboard = Keyboard.builder().build();
     }
 

@@ -1,4 +1,4 @@
-package com.nikolayzakharevich;
+package com.nikolayzakharevich.tools;
 
 public class Pair<K, V> {
     private K key;

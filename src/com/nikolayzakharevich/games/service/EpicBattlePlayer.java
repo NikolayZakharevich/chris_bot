@@ -1,6 +1,7 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
 
 class EpicBattlePlayer extends Player<EpicBattle> {
+
     private int hp;
 
     EpicBattlePlayer(int vkId) {

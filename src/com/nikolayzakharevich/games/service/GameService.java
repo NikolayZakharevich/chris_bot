@@ -1,6 +1,6 @@
-package com.nikolayzakharevich.games;
+package com.nikolayzakharevich.games.service;
 
-public interface GameClient {
+public interface GameService {
 
     void init(String gameName, int userId);
 

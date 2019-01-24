@@ -16,5 +16,6 @@
     <orderEntry type="library" name="jetty-io-9.4.14.v20181114" level="application" />
     <orderEntry type="library" name="slf4j-api-1.7.25-sources" level="application" />
     <orderEntry type="library" name="Simple Logging Facade for Java:1.7.25" level="application" />
+    <orderEntry type="library" name="mssql-jdbc-7.0.0.jre10" level="application" />
   </component>
 </module>
