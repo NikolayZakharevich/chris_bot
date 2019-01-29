@@ -3,11 +3,12 @@ package com.nikolayzakharevich.games.dao;
 import static com.nikolayzakharevich.games.GameConstants.*;
 
 import com.nikolayzakharevich.exeptions.DriverRegistrationFailedException;
+import com.nikolayzakharevich.games.service.Game;
 
 import java.sql.*;
 import java.util.List;
 
-public class MsSqlDatabase implements Dao {
+public class MsSqlDao {
 
     private String serverName;
     private String databaseName;
@@ -15,7 +16,7 @@ public class MsSqlDatabase implements Dao {
     private String password;
     private Connection connection;
 
-    MsSqlDatabase(String serverName, String databaseName, String userName, String password) {
+    MsSqlDao(String serverName, String databaseName, String userName, String password) {
         this.serverName = serverName;
         this.databaseName = databaseName;
         this.userName = userName;
@@ -32,28 +33,13 @@ public class MsSqlDatabase implements Dao {
         }
     }
 
-    @Override
-    public void addChat(int chatId) {
-
-    }
-
-    @Override
-    public void addGame(String name, List<Integer> playerIds) {
-
-    }
-
-    @Override
-    public void addPlayer(int vkId) {
-
-    }
-
     private void createTableForPlayers(String gameName) {
         String query;
         switch (gameName) {
             case EPIC_BATTLE_NAME:
                 break;
             case ROCK_PAPER_SCISSORS_NAME:
-                query = "CREATE IF NOT EXISTS";
+                // TODO: 29.01.19  
                 break;
             default:
 
@@ -71,4 +57,5 @@ public class MsSqlDatabase implements Dao {
         }
         return resultSet;
     }
+
 }

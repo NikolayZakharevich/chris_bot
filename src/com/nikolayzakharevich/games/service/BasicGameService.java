@@ -1,64 +1,94 @@
 package com.nikolayzakharevich.games.service;
 
+import static com.nikolayzakharevich.games.GameConstants.*;
+import static com.nikolayzakharevich.vkapi.VkApiUsage.getFirstName;
+
+import com.nikolayzakharevich.exeptions.InvalidPayloadException;
 import com.nikolayzakharevich.games.dao.Dao;
 import com.nikolayzakharevich.games.dao.DaoImplementationChooser;
 
 import java.util.List;
 
-import static com.nikolayzakharevich.games.GameConstants.EPIC_BATTLE_NAME;
-import static com.nikolayzakharevich.games.GameConstants.ROCK_PAPER_SCISSORS_NAME;
-
 public class BasicGameService implements GameService {
 
     private int chatId;
-    private Game currentGame;
-    private String message;
     private Dao dao;
 
-    public BasicGameService(int chatId) {
+    BasicGameService(int chatId) {
         this.chatId = chatId;
-        dao = DaoImplementationChooser.getDao();
+        dao = DaoImplementationChooser.getDao(chatId);
     }
 
     @Override
     public void init(String gameName, int userId) {
+        Game currentGame = getCurrentGame();
+        if (currentGame != null) {
+            dao.saveMessage("Нельзя начать более одной игры!");
+            return;
+        }
+
         switch (gameName) {
             case EPIC_BATTLE_NAME:
-                // TODO: 20.01.19
+                currentGame = new EpicBattle();
+                currentGame.init(userId);
                 break;
             case ROCK_PAPER_SCISSORS_NAME:
                 currentGame = new RockPaperScissors();
                 currentGame.init(userId);
                 break;
-
             default:
-                // TODO: 20.01.19
+                throw new InvalidPayloadException();
         }
-        message = currentGame.getMessage();
+        dao.saveKeyboard(currentGame.getKeyboard());
+        dao.saveMessage(currentGame.getMessage());
+        dao.saveGame(currentGame);
     }
 
     @Override
-    public void process(String text, int userId) {
-        if (!isValidPlayer(userId)) {
-            message = "@id" + userId + ", не лезь, блин\n" + message;
+    public void process(String text, int userId, String payload) {
+        Game game = getCurrentGame();
+        if (!isValidPlayer(game, userId)) {
+            dao.saveMessage("@id" + userId + "(" + getFirstName(userId) + "), не лезь, блин\n");
         } else {
-            currentGame.processMessage(text);
-            message = currentGame.getMessage();
+            game.processMessage(text, payload);
+            if (game.isClosed()) {
+                dao.closeGame(game);
+            } else {
+                dao.saveGame(game);
+            }
+            dao.saveMessage(game.getMessage());
+            dao.saveKeyboard(game.getKeyboard());
         }
     }
 
     @Override
     public String getKeyboard() {
-        return currentGame.getKeyboard();
+        return dao.getKeyboard();
     }
 
     @Override
     public String getMessage() {
-        return message;
+        return dao.getMessage();
     }
 
-    private boolean isValidPlayer(int userId) {
-        List<Player<?>> currentPlayers = currentGame.getCurrentPlayers();
+    private boolean isValidPlayer(Game game, int userId) {
+        List<Player<?>> currentPlayers = game.getCurrentPlayers();
         return currentPlayers.stream().anyMatch(player -> player.getVkId() == userId);
+    }
+
+    private Game getCurrentGame() {
+        String gameName = dao.getCurrentGameType();
+        Game result = null;
+        if (gameName != null) {
+            switch (gameName) {
+                case EPIC_BATTLE_NAME:
+                    result = dao.getCurrentGame(EpicBattle.class);
+                    break;
+                case ROCK_PAPER_SCISSORS_NAME:
+                    result = dao.getCurrentGame(RockPaperScissors.class);
+                    break;
+            }
+        }
+        return result;
     }
 }

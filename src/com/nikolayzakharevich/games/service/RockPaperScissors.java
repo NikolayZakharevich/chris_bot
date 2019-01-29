@@ -1,11 +1,12 @@
 package com.nikolayzakharevich.games.service;
 
-import com.nikolayzakharevich.tools.Color;
-import com.nikolayzakharevich.tools.Keyboard;
+import com.nikolayzakharevich.stuff.Color;
+import com.nikolayzakharevich.vkapi.Keyboard;
 
 import java.util.Random;
 
 import static com.nikolayzakharevich.games.GameConstants.*;
+import static com.nikolayzakharevich.vkapi.VkApiUsage.*;
 
 class RockPaperScissors extends Game {
 
@@ -35,7 +36,7 @@ class RockPaperScissors extends Game {
     }
 
     @Override
-    void processMessage(String text) {
+    void processMessage(String text, String payload) {
         if (text.matches("[0-9]+")) {
             firstAction(text);
         } else {
@@ -51,14 +52,15 @@ class RockPaperScissors extends Game {
         message = "Игра начинается. Выберите действие:";
 
         keyboard = Keyboard.builder()
-                .addButton(ROCK_PAPER_SCISSORS_PAPER, Color.RED, ROCK_PAPER_SCISSORS_ACTION)
                 .addButton(ROCK_PAPER_SCISSORS_ROCK, Color.BLUE, ROCK_PAPER_SCISSORS_ACTION)
                 .addButton(ROCK_PAPER_SCISSORS_SCISSORS, Color.GREEN, ROCK_PAPER_SCISSORS_ACTION)
+                .addButton(ROCK_PAPER_SCISSORS_PAPER, Color.RED, ROCK_PAPER_SCISSORS_ACTION)
                 .setOneTime(true)
                 .build();
     }
 
     private void nextAction(String text) {
+
         String[] values = {ROCK_PAPER_SCISSORS_ROCK, ROCK_PAPER_SCISSORS_SCISSORS, ROCK_PAPER_SCISSORS_PAPER};
         String botAnswer = values[RANDOM.nextInt(values.length)];
 
@@ -72,12 +74,14 @@ class RockPaperScissors extends Game {
             player.addLoss();
         }
 
-        message = "Крис использовал " + botAnswer + ", счет - " + player.getWins() + " - " + player.getLosses();
+        message = getFirstName(player.vkId) + " " + text + " vs. " + botAnswer + " Крис\n" +
+                "счет: " + player.getWins() + " - " + player.getLosses();
     }
 
     private void finalAction() {
+        isClosed = true;
         message += "\nИгра окончена";
-        message += "\nПобедитель - " + (player.getWins() == limit ? "Человек" : "Робот");
+        message += "\nПобедитель - " + (player.getWins() == limit ? getFirstName(player.getVkId()) : "Крис") + "!";
         keyboard = Keyboard.builder().build();
     }
 

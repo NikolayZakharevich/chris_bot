@@ -1,6 +1,7 @@
 package com.nikolayzakharevich;
 
 import static com.nikolayzakharevich.games.GameConstants.*;
+import static com.nikolayzakharevich.vkapi.VkApiUsage.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -8,8 +9,10 @@ import com.google.gson.JsonSyntaxException;
 import com.nikolayzakharevich.games.client.GameClient;
 import com.nikolayzakharevich.games.client.BasicGameClient;
 
-import com.nikolayzakharevich.tools.Color;
-import com.nikolayzakharevich.tools.Keyboard;
+import com.nikolayzakharevich.stuff.Color;
+import com.nikolayzakharevich.vkapi.Keyboard;
+
+import com.nikolayzakharevich.vkapi.VkApiUsage;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
@@ -18,8 +21,7 @@ import com.vk.api.sdk.objects.users.UserXtrCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 class ChatHandler extends BotRequestHandler {
 
@@ -33,42 +35,12 @@ class ChatHandler extends BotRequestHandler {
 
     @Override
     void sayHi(int chatId) {
-        try {
-
-            String code = "return API.messages.getConversationMembers(" +
-                    "{\"peer_id\":" + (chatId + CHAT_ID_SHIFT) + ",\"v\":5.92});";
-            JsonElement element = apiClient.execute()
-                    .code(actor, code)
-                    .execute();
-            JsonArray members = element
-                    .getAsJsonObject()
-                    .get("profiles")
-                    .getAsJsonArray();
-            if (members.size() == 0) {
-                LOG.error("Unable to say hi in chat " + chatId);
-                return;
-            }
-
-            String userId = members
-                    .get(RANDOM.nextInt(members.size()))
-                    .getAsJsonObject()
-                    .get("id")
-                    .getAsString();
-            UserXtrCounters user = apiClient.users()
-                    .get(actor)
-                    .userIds(String.valueOf(userId))
-                    .execute()
-                    .get(0);
-            String message = "Бросаем кубик... Результат: " + user.getFirstName() + " - любит члены";
-            apiClient.messages().send(actor)
-                    .chatId(chatId)
-                    .message(message)
-                    .execute();
-
-            LOG.info("Said hi to user " + userId + " in chat " + chatId);
-        } catch (JsonSyntaxException | ApiException | ClientException e) {
-            // ignore
-        }
+        List<Integer> chatMembers = getChatMembersIds(chatId);
+        int target = chatMembers.get(RANDOM.nextInt(chatMembers.size()));
+        String message = "Бросаем кубик... Результат: " + getFirstName(target) + " " +
+                getLastName(target) + " - любит члены";
+        sendMessage(chatId, message);
+        LOG.info("Said hi to user " + target + " in chat " + chatId);
     }
 
     @Override
@@ -77,21 +49,25 @@ class ChatHandler extends BotRequestHandler {
         text = text.substring(text.indexOf(" ") + 1);
         switch (payload) {
             case EPIC_BATTLE_INIT:
-                // TODO: 20.01.19
+                LOG.info("Initialization of EpicBattle in chat " + chatId);
+                gameClient.init(chatId, text, userId);
+                break;
+            case EPIC_BATTLE_ACTION:
+                LOG.info("Action of EpicBattle in chat " + chatId);
+                gameClient.process(chatId, text, userId, payload);
                 break;
             case ROCK_PAPER_SCISSORS_INIT:
                 LOG.info("Initialization of RockPaperScissors in chat " + chatId);
                 gameClient.init(chatId, text, userId);
-                sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
                 break;
             case ROCK_PAPER_SCISSORS_ACTION:
                 LOG.info("Action of RockPaperScissors in chat " + chatId);
-                gameClient.process(chatId, text, userId);
-                sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
+                gameClient.process(chatId, text, userId, payload);
                 break;
             default:
                 // TODO: 20.01.19
         }
+        sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
     }
 
     @Override
@@ -102,20 +78,12 @@ class ChatHandler extends BotRequestHandler {
             if (text.equalsIgnoreCase("список игр")) {
                 getGameList(chatId);
             }
+            if (text.equalsIgnoreCase("повтори")) {
+                sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
+            }
         }
     }
 
-    private void sendKeyboardMessage(int chatId, String message, String keyboard) {
-        try {
-            apiClient.messages().send(actor)
-                    .chatId(chatId)
-                    .message(message)
-                    .unsafeParam("keyboard", keyboard)
-                    .execute();
-        } catch (ApiException | ClientException e) {
-            // ignore
-        }
-    }
 
     private void tryKeyboard(int chatId, String text) {
         String[] parameters = text.split("\\s");

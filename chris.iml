@@ -7,15 +7,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="sdk-0.5.12" level="application" />
-    <orderEntry type="library" name="com.vk.api:sdk:0.5.12" level="application" />
-    <orderEntry type="library" name="jetty-server-9.4.14.v20181114" level="application" />
-    <orderEntry type="library" name="javax.servlet:javax.servlet-api:4.0.1" level="application" />
-    <orderEntry type="library" name="jetty-util-9.4.14.v20181114" level="application" />
-    <orderEntry type="library" name="jetty-http-9.4.14.v20181114" level="application" />
-    <orderEntry type="library" name="jetty-io-9.4.14.v20181114" level="application" />
-    <orderEntry type="library" name="slf4j-api-1.7.25-sources" level="application" />
-    <orderEntry type="library" name="Simple Logging Facade for Java:1.7.25" level="application" />
-    <orderEntry type="library" name="mssql-jdbc-7.0.0.jre10" level="application" />
+    <orderEntry type="library" exported="" name="sdk-0.5.12" level="application" />
+    <orderEntry type="library" exported="" name="com.vk.api:sdk:0.5.12" level="application" />
+    <orderEntry type="library" exported="" name="jetty-server-9.4.14.v20181114" level="application" />
+    <orderEntry type="library" exported="" name="javax.servlet:javax.servlet-api:4.0.1" level="application" />
+    <orderEntry type="library" exported="" name="jetty-util-9.4.14.v20181114" level="application" />
+    <orderEntry type="library" exported="" name="jetty-http-9.4.14.v20181114" level="application" />
+    <orderEntry type="library" exported="" name="jetty-io-9.4.14.v20181114" level="application" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.25-sources" level="application" />
+    <orderEntry type="library" exported="" name="Simple Logging Facade for Java:1.7.25" level="application" />
+    <orderEntry type="library" exported="" name="mssql-jdbc-7.0.0.jre10" level="application" />
+    <orderEntry type="library" exported="" name="jedis-2.9.0" level="application" />
+    <orderEntry type="library" name="async-http-client-2.0.33-sources" level="project" />
+    <orderEntry type="library" name="org.apache.commons:commons-pool2:2.6.0" level="application" />
   </component>
 </module>

@@ -14,7 +14,7 @@ class EpicBattle extends Game {
     }
 
     @Override
-    void processMessage(String text) {
+    void processMessage(String text, String payload) {
 
     }
 }

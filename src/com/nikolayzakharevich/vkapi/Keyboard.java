@@ -1,9 +1,10 @@
-package com.nikolayzakharevich.tools;
+package com.nikolayzakharevich.vkapi;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.nikolayzakharevich.exeptions.KeyboardException;
+import com.nikolayzakharevich.stuff.Color;
 
 public class Keyboard {
 

@@ -4,7 +4,7 @@ public interface GameService {
 
     void init(String gameName, int userId);
 
-    void process(String text, int userId);
+    void process(String text, int userId, String payload);
 
     String getKeyboard();
 

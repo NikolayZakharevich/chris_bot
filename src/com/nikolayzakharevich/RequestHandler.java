@@ -3,7 +3,6 @@ package com.nikolayzakharevich;
 import com.google.gson.*;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.GroupActor;
-import com.vk.api.sdk.client.actors.UserActor;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Date;
 
 public class RequestHandler extends AbstractHandler {
 
@@ -20,6 +20,7 @@ public class RequestHandler extends AbstractHandler {
     private final static String OK_BODY = "ok";
     private final static String CONFIRMATION_CODE = "4bd01262";
     private final static int CHAT_ID_SHIFT = 2000000000;
+    private final static long MAX_MESSAGE_DELAY_MILLIS = 3000;
 
 
     private final DialogHandler dialogHandler;
@@ -57,9 +58,16 @@ public class RequestHandler extends AbstractHandler {
                     break;
                 case MESSAGE_TYPE:
                     JsonObject object = requestJson.getAsJsonObject("object");
+
+                    long date = object.getAsJsonPrimitive("date").getAsLong() * 1000;
+                    if (new Date().getTime() - date > MAX_MESSAGE_DELAY_MILLIS) {
+                        return;
+                    }
+
                     int userId = object.getAsJsonPrimitive("from_id").getAsInt();
                     int chatId = object.getAsJsonPrimitive("peer_id").getAsInt();
                     String text = object.getAsJsonPrimitive("text").getAsString();
+
                     BotRequestHandler handler;
                     if (chatId < CHAT_ID_SHIFT) {
                         handler = dialogHandler;

@@ -1,13 +1,23 @@
 package com.nikolayzakharevich.games.dao;
 
-import java.util.List;
+import com.nikolayzakharevich.games.service.Game;
 
 public interface Dao {
 
-    void addChat(int chatId);
+    String getCurrentGameType();
 
-    void addGame(String name, List<Integer> playerIds);
+    String getMessage();
 
-    void addPlayer(int vkId);
+    String getKeyboard();
+
+    <T extends Game> T getCurrentGame(Class<T> clazz);
+
+    void saveGame(Game game);
+
+    void saveMessage(String message);
+
+    void saveKeyboard(String keyboard);
+
+    void closeGame(Game game);
 
 }

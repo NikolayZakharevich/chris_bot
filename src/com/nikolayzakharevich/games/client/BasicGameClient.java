@@ -17,9 +17,9 @@ public class BasicGameClient implements GameClient {
     }
 
     @Override
-    public void process(int chatId, String text, int userId) {
+    public void process(int chatId, String text, int userId, String payload) {
         GameService service = getChatService(chatId);
-        service.process(text, userId);
+        service.process(text, userId, payload);
     }
 
     @Override
