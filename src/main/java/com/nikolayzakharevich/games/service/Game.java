@@ -17,7 +17,7 @@ public abstract class Game {
     protected Player<?> currentPlayer;
     protected String keyboard;
     protected String message;
-    protected boolean isClosed;
+    protected boolean isEnded;
     protected int chatId;
     private Date currentTime;
 
@@ -53,8 +53,8 @@ public abstract class Game {
         return currentPlayer;
     }
 
-    boolean isClosed() {
-        return isClosed;
+    boolean isEnded() {
+        return isEnded;
     }
 
     public String toJson() {

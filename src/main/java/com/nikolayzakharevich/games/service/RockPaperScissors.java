@@ -3,8 +3,6 @@ package com.nikolayzakharevich.games.service;
 import com.nikolayzakharevich.stuff.Color;
 import com.nikolayzakharevich.vkapi.Keyboard;
 
-import java.util.Random;
-
 import static com.nikolayzakharevich.games.GameConstants.*;
 import static com.nikolayzakharevich.vkapi.VkApiUsage.*;
 
@@ -78,7 +76,7 @@ class RockPaperScissors extends Game {
     }
 
     private void finalAction() {
-        isClosed = true;
+        isEnded = true;
         message += "\nИгра окончена";
         message += "\nПобедитель - " + (player.getWins() == limit ? getFirstName(player.getVkId()) : "Крис") + "!";
         keyboard = Keyboard.builder().build();

@@ -6,6 +6,7 @@ import static com.nikolayzakharevich.vkapi.VkApiUsage.*;
 import com.nikolayzakharevich.games.client.GameClient;
 import com.nikolayzakharevich.games.client.BasicGameClient;
 
+import com.nikolayzakharevich.games.client.GameStoppingClient;
 import com.nikolayzakharevich.stuff.Color;
 import com.nikolayzakharevich.vkapi.Keyboard;
 
@@ -15,12 +16,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class ChatHandler extends BotRequestHandler {
 
     private final static Logger LOG = LoggerFactory.getLogger(BotRequestHandler.class);
+    private final static long VOTE_TIME = 60000;
 
     private GameClient gameClient = new BasicGameClient();
+    private GameClient voteClient = new GameStoppingClient();
+    private Timer timer;
 
     ChatHandler(VkApiClient apiClient, GroupActor actor) {
         super(apiClient, actor);
@@ -38,16 +44,32 @@ class ChatHandler extends BotRequestHandler {
 
     @Override
     void processMessage(int userId, int chatId, String text, String payload) {
-        text = text.substring(text.indexOf("]") + 2);
+        boolean type1 = text.contains("[club156440140|@randmagic] ");
+        boolean type2 = text.contains("[club156440140|Крис Бот] ");
+        if (type1) {
+            text = text.substring("[club156440140|@randmagic] ".length());
+        } else if (type2) {
+            text = text.substring("[club156440140|Крис Бот] ".length());
+        }
+
+        LOG.info("message = " + text);
+
+        if (payload.equalsIgnoreCase(VOTE_STOP_GAME)) {
+            LOG.info("A vote for stopping current game in chat " + chatId);
+            voteClient.process(chatId, text, userId, payload);
+            sendKeyboardMessage(chatId, voteClient.getMessage(chatId), voteClient.getKeyboard(chatId));
+            return;
+        }
+
         switch (payload) {
             case EPIC_BATTLE_INIT:
                 LOG.info("Initialization of EpicBattle in chat " + chatId);
                 gameClient.init(chatId, text, userId);
                 break;
-            case EPIC_BATTLE_CHALLENGE:
-            case EPIC_BATTLE_CONFIRM:
-            case EPIC_BATTLE_START:
-            case EPIC_BATTLE_HERO_PICK:
+            case EPIC_BATTLE_ACT1_CHALLENGE:
+            case EPIC_BATTLE_ACT2_CONFIRM:
+            case EPIC_BATTLE_ACT3_FIRST_HERO_PICK:
+            case EPIC_BATTLE_ACT4_SECOND_HERO_PICK:
                 LOG.info("Action of EpicBattle in chat " + chatId);
                 gameClient.process(chatId, text, userId, payload);
                 break;
@@ -60,7 +82,6 @@ class ChatHandler extends BotRequestHandler {
                 gameClient.process(chatId, text, userId, payload);
                 break;
             default:
-                // TODO: 20.01.19
         }
         sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
     }
@@ -71,9 +92,27 @@ class ChatHandler extends BotRequestHandler {
             getGameList(chatId);
         } else if (text.equalsIgnoreCase("повтори")) {
             sendKeyboardMessage(chatId, gameClient.getMessage(chatId), gameClient.getKeyboard(chatId));
+        } else if (text.equalsIgnoreCase("повтори голосование")) {
+            sendKeyboardMessage(chatId, voteClient.getMessage(chatId), voteClient.getKeyboard(chatId));
+        } else if (text.equalsIgnoreCase("стоп игра")) {
+            voteClient.init(chatId, text, userId);
+            sendKeyboardMessage(chatId, voteClient.getMessage(chatId), voteClient.getKeyboard(chatId));
+            if (!voteClient.getMessage(chatId).equals(VOTE_ALREADY_RUNNING)) {
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        voteClient.process(chatId, text, userId, VOTE_END_STOP_GAME);
+                        sendKeyboardMessage(chatId, voteClient.getMessage(chatId),
+                                voteClient.getKeyboard(chatId));
+                    }
+                }, VOTE_TIME);
+            }
         } else if (text.equalsIgnoreCase("команды")) {
             String message = "\"список игр\" чтобы посмотреть игры\n" +
                     "\"повтори\" если потерялось сообщение или клавиатура\n" +
+                    "\"повтори голосование\" если потерялось сообщение или клавиатура голосования\n" +
+                    "\"стоп игра\" чтобы остановить текущую игру" +
                     "\"команды\" чтобы посмотреть команды";
             sendMessage(chatId, message);
         }

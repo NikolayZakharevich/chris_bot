@@ -24,7 +24,7 @@ class EpicBattle extends Game {
         Keyboard.Builder builder = Keyboard.builder();
         for (int member : chatMembers) {
             if (member != initiatorId) {
-                builder.addButton(getFirstName(member) + " " + getLastName(member), Color.WHITE, EPIC_BATTLE_CHALLENGE)
+                builder.addButton(getFirstName(member) + " " + getLastName(member), Color.WHITE, EPIC_BATTLE_ACT1_CHALLENGE)
                         .newRow();
             }
         }
@@ -36,15 +36,17 @@ class EpicBattle extends Game {
     void processMessage(String text, String payload) {
 
         switch (payload) {
-            case EPIC_BATTLE_CHALLENGE:
+            case EPIC_BATTLE_ACT1_CHALLENGE:
                 acceptChallenge(text);
                 break;
-            case EPIC_BATTLE_CONFIRM:
+            case EPIC_BATTLE_ACT2_CONFIRM:
                 if (checkConfirmation(text)) {
-                    firstAction(text);
+                    firstPlayerHeroPick(text);
                 }
                 break;
-            case EPIC_BATTLE_HERO_PICK:
+            case EPIC_BATTLE_ACT3_FIRST_HERO_PICK:
+
+            case EPIC_BATTLE_ACT4_SECOND_HERO_PICK:
 
             default:
 
@@ -60,9 +62,9 @@ class EpicBattle extends Game {
         Player<EpicBattle> player = new EpicBattlePlayer(secondPlayerId);
         players.add(player);
         currentPlayer = player;
-        keyboard = Keyboard.builder().addButton("Го", Color.GREEN, EPIC_BATTLE_CONFIRM)
+        keyboard = Keyboard.builder().addButton("Го", Color.GREEN, EPIC_BATTLE_ACT2_CONFIRM)
                 .newRow()
-                .addButton("Зассал(", Color.RED, EPIC_BATTLE_CONFIRM)
+                .addButton("Зассал(", Color.RED, EPIC_BATTLE_ACT2_CONFIRM)
                 .setOneTime(true)
                 .build();
         message = getFirstName(secondPlayerId) + ", принимаешь вызов?";
@@ -72,14 +74,14 @@ class EpicBattle extends Game {
         if (text.equalsIgnoreCase("го")) {
             return true;
         } else {
-            isClosed = true;
+            isEnded = true;
             message = getFirstName(currentPlayer.vkId) + " ссыкло(";
             keyboard = Keyboard.builder().build();
             return false;
         }
     }
 
-    private void firstAction(String text) {
+    private void firstPlayerHeroPick(String text) {
         currentPlayer = players.get(RANDOM.nextInt(2));
 
         message = "@id" + currentPlayer.vkId + "(" + getFirstName(currentPlayer.vkId) + "), ваш ход!\n" +
@@ -94,8 +96,8 @@ class EpicBattle extends Game {
                 "&#128167; (6) Астральный взрыв: (2+&#128420;)&#128481;\n\n";
 
         keyboard = Keyboard.builder()
-                .addButton(EPIC_BATTLE_PALADIN, Color.WHITE, EPIC_BATTLE_HERO_PICK)
-                .addButton(EPIC_BATTLE_NECROMANCER, Color.BLUE, EPIC_BATTLE_HERO_PICK)
+                .addButton(EPIC_BATTLE_PALADIN, Color.WHITE, EPIC_BATTLE_ACT3_FIRST_HERO_PICK)
+                .addButton(EPIC_BATTLE_NECROMANCER, Color.BLUE, EPIC_BATTLE_ACT3_FIRST_HERO_PICK)
                 .setOneTime(true)
                 .build();
     }

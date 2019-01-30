@@ -10,4 +10,13 @@ public interface GameService {
 
     String getMessage();
 
+    String getVoteMessage();
+
+    String getVoteKeyboard();
+
+    void startVoting(int userId);
+
+    void processVote(String text, int userId);
+
+    void checkVotingResults();
 }
