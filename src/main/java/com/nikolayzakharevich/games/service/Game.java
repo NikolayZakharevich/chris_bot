@@ -9,20 +9,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public abstract class Game {
+public abstract class Game<PlayerType extends Player> {
 
-    protected Random RANDOM = new Random();
-    protected final String name;
-    protected List<Player<?>> players = new ArrayList<>();
-    protected Player<?> currentPlayer;
-    protected String keyboard;
+    static Random RANDOM = new Random();
+    private final String name;
+    List<PlayerType> players = new ArrayList<>();
+    PlayerType currentPlayer;
+    String keyboard;
     protected String message;
-    protected boolean isEnded;
+    boolean isEnded;
     protected int chatId;
     private Date currentTime;
 
-    private final static Gson gson = new GsonBuilder().registerTypeAdapter(Player.class,
-            new AbstractGsonAdapter<Player>()).create();
+    private final static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Player.class, new AbstractGsonAdapter<Player>())
+            .registerTypeAdapter(EpicBattlePlayer.Hero.class, new AbstractGsonAdapter<EpicBattlePlayer.Hero>())
+            .registerTypeAdapter(EpicBattlePlayer.Skill.class, new AbstractGsonAdapter<EpicBattlePlayer.Skill>())
+            .create();
 
     Game(String name, int chatId) {
         this.name = name;
@@ -43,14 +46,6 @@ public abstract class Game {
 
     public String getName() {
         return name;
-    }
-
-    List<Player<?>> getPlayers() {
-        return players;
-    }
-
-    Player<?> getCurrentPlayer() {
-        return currentPlayer;
     }
 
     boolean isEnded() {

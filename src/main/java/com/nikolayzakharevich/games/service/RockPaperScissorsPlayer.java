@@ -1,6 +1,6 @@
 package com.nikolayzakharevich.games.service;
 
-class RockPaperScissorsPlayer extends Player<RockPaperScissors> {
+class RockPaperScissorsPlayer extends Player {
 
     private int wins;
     private int draws;

@@ -70,6 +70,8 @@ class ChatHandler extends BotRequestHandler {
             case EPIC_BATTLE_ACT2_CONFIRM:
             case EPIC_BATTLE_ACT3_FIRST_HERO_PICK:
             case EPIC_BATTLE_ACT4_SECOND_HERO_PICK:
+            case EPIC_BATTLE_ACT_NEXT:
+            case EPIC_BATTLE_ACT_CONTINUE:
                 LOG.info("Action of EpicBattle in chat " + chatId);
                 gameClient.process(chatId, text, userId, payload);
                 break;

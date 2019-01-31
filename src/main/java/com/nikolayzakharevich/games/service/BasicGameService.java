@@ -9,7 +9,6 @@ import com.nikolayzakharevich.games.dao.DaoImplementationChooser;
 import com.nikolayzakharevich.stuff.Color;
 import com.nikolayzakharevich.vkapi.Keyboard;
 
-import java.security.Key;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -103,7 +102,7 @@ public class BasicGameService implements GameService {
                 return;
             }
 
-            Game game = getCurrentGame();
+            Game<Player> game = getCurrentGame();
             if (game == null) {
                 message = "Нет текущих игр";
             } else if (game.players.stream()
@@ -172,10 +171,10 @@ public class BasicGameService implements GameService {
     }
 
     private boolean isValidPlayer(Game game, int userId) {
-        return game.getCurrentPlayer().vkId == userId;
+        return game.currentPlayer.vkId == userId;
     }
 
-    private Game getCurrentGame() {
+    private Game<Player> getCurrentGame() {
         String gameName = dao.getCurrentGameType();
         Game result = null;
         if (gameName != null) {

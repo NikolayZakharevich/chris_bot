@@ -6,7 +6,7 @@ import com.nikolayzakharevich.vkapi.Keyboard;
 import static com.nikolayzakharevich.games.GameConstants.*;
 import static com.nikolayzakharevich.vkapi.VkApiUsage.*;
 
-class RockPaperScissors extends Game {
+class RockPaperScissors extends Game<RockPaperScissorsPlayer> {
 
     private RockPaperScissorsPlayer player;
     private int limit;
@@ -78,7 +78,7 @@ class RockPaperScissors extends Game {
     private void finalAction() {
         isEnded = true;
         message += "\nИгра окончена";
-        message += "\nПобедитель - " + (player.getWins() == limit ? getFirstName(player.getVkId()) : "Крис") + "!";
+        message += "\nПобедитель - " + (player.getWins() == limit ? getFirstName(player.vkId) : "Крис") + "!";
         keyboard = Keyboard.builder().build();
     }
 

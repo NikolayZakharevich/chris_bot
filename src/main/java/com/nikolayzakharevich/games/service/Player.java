@@ -1,15 +1,16 @@
 package com.nikolayzakharevich.games.service;
 
-abstract class Player<T extends Game> {
+abstract class Player {
 
-    protected int vkId;
+    int vkId;
 
     Player(int vkId) {
         this.vkId = vkId;
     }
 
-    public int getVkId() {
-        return vkId;
+    Player(Player currentPlayer) {
+        int temp = vkId;
+        vkId = currentPlayer.vkId;
+        currentPlayer.vkId = temp;
     }
-
 }
