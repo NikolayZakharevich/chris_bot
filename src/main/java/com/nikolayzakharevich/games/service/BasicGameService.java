@@ -52,7 +52,7 @@ public class BasicGameService implements GameService {
     public void process(String text, int userId, String payload) {
         Game game = getCurrentGame();
         if (!isValidPlayer(game, userId)) {
-            dao.saveMessage("@id" + userId + "(" + getFirstName(userId) + "), не лезь, блин\n");
+            dao.saveMessage(getFirstName(userId) + ", не лезь, блин\n");
         } else {
             game.processMessage(text, payload);
             if (game.isEnded()) {
@@ -189,4 +189,5 @@ public class BasicGameService implements GameService {
         }
         return result;
     }
+
 }

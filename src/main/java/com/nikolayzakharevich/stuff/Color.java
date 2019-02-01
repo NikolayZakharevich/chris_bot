@@ -1,5 +1,7 @@
 package com.nikolayzakharevich.stuff;
 
+import java.util.Random;
+
 public enum Color {
 
     BLUE("primary"),
@@ -17,4 +19,16 @@ public enum Color {
     public String toString() {
         return value;
     }
+
+    public static Color random() {
+        int seed = new Random().nextInt(4);
+        switch (seed) {
+            case 0: return BLUE;
+            case 1: return WHITE;
+            case 2: return RED;
+            case 3: return GREEN;
+            default: return BLUE;
+        }
+    }
+
 }

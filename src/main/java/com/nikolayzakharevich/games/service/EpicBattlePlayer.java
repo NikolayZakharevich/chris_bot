@@ -14,11 +14,14 @@ class EpicBattlePlayer extends Player {
     abstract static class Hero<HeroType extends Hero> {
 
         final int MAX_HP;
+        final int MAX_MANA = 6;
         final String name;
         final String icon;
 
         int hp;
         int mana;
+
+        boolean repeatTurn;
 
         Map<String, Skill<HeroType>> skills = new HashMap<>();
         Skill<Hero> tap = new Tap();
@@ -30,8 +33,12 @@ class EpicBattlePlayer extends Player {
             hp = maxHp;
         }
 
+        String attributesInfo() {
+            return mana + EPIC_BATTLE_MANA_ICON;
+        }
+
         void addMana(int points) {
-            mana = Math.min(6, mana + points);
+            mana = Math.min(MAX_MANA, mana + points);
         }
 
         void heal(int points) {
@@ -47,6 +54,12 @@ class EpicBattlePlayer extends Player {
         }
 
         abstract void useSkill(String skill, Hero target);
+
+        void startOfTurnEffect(Hero enemy) {
+            repeatTurn = false;
+        }
+
+        void endOfTurnEffect(Hero enemy) {}
 
         boolean isDead() {
             return hp <= 0;
@@ -83,9 +96,11 @@ class EpicBattlePlayer extends Player {
             skills.put(EPIC_BATTLE_HOLY_LIGHT_SKILL, new HolyLight());
         }
 
+        @Override
         void useSkill(String skill, Hero target) {
             skills.get(skill).use(this, target);
         }
+
     }
 
     static class Necromancer extends Hero<Necromancer> {
@@ -102,11 +117,18 @@ class EpicBattlePlayer extends Player {
         void useSkill(String skill, Hero target) {
             skills.get(skill).use(this, target);
         }
+
+        @Override
+        String attributesInfo() {
+            return super.attributesInfo() + ", " + souls + EPIC_BATTLE_SOUL_ICON;
+        }
     }
 
     static class Huntress extends Hero<Huntress> {
 
         int bonus;
+        boolean magicArrowUsed;
+        boolean salvoUsed;
 
         Huntress() {
             super(EPIC_BATTLE_HUNTRESS, EPIC_BATTLE_HUNTRESS_ICON, 20);
@@ -117,6 +139,21 @@ class EpicBattlePlayer extends Player {
         @Override
         void useSkill(String skill, Hero target) {
             skills.get(skill).use(this, target);
+        }
+
+        @Override
+        String attributesInfo() {
+            return super.attributesInfo() + ", " + (bonus + 1) + EPIC_BATTLE_ARROW_ICON;
+        }
+
+        @Override
+        void endOfTurnEffect(Hero enemy) {
+            if (magicArrowUsed && !salvoUsed) {
+                enemy.doDamage(1 + bonus);
+            }
+            magicArrowUsed = false;
+            salvoUsed = false;
+            bonus = 0;
         }
     }
 
@@ -134,6 +171,120 @@ class EpicBattlePlayer extends Player {
         }
     }
 
+    static class Mage extends Hero<Mage> {
+
+        private int ice;
+        private int fire;
+
+        Mage() {
+            super(EPIC_BATTLE_MAGE, EPIC_BATTLE_MAGE_ICON, 20);
+            skills.put(EPIC_BATTLE_FIRE_ORB_SKILL, new FireOrb());
+            skills.put(EPIC_BATTLE_ICE_ORB_SKILL, new IceOrb());
+        }
+
+        @Override
+        void useSkill(String skill, Hero target) {
+            skills.get(skill).use(this, target);
+        }
+
+        @Override
+        String attributesInfo() {
+            return super.attributesInfo() + ", " + fire + EPIC_BATTLE_FIRE_ICON + ", " + ice + EPIC_BATTLE_ICE_ICON;
+        }
+
+        @Override
+        void endOfTurnEffect(Hero enemy) {
+            if (fire == 1 && ice == 0) {
+                enemy.doDamage(Game.RANDOM.nextInt(2) + 1);
+            } else if (fire == 0 && ice == 1) {
+                this.heal(Game.RANDOM.nextInt(2) + 2);
+            } else if (fire == 2 && ice == 0) {
+                enemy.doDamage(Game.RANDOM.nextInt(2) + 2);
+            } else if (fire == 1 && ice == 1) {
+                enemy.doDamage(1);
+                repeatTurn = true;
+            } else if (fire == 3 && ice == 0) {
+                enemy.doDamage(Game.RANDOM.nextInt(3) + 3);
+            } else if (fire == 0 && ice == 2) {
+                enemy.heal(Game.RANDOM.nextInt(2) + 4);
+            }
+            ice = 0;
+            fire = 0;
+        }
+    }
+
+    static class Demon extends Hero<Demon> {
+
+        Demon() {
+            super(EPIC_BATTLE_DEMON, EPIC_BATTLE_DEMON_ICON, 20);
+            skills.put(EPIC_BATTLE_FUNERAL_FLOWERS_SKILL, new FuneralFlowers());
+            skills.put(EPIC_BATTLE_FATE_TRAP_SKILL, new FateTrap());
+        }
+
+        @Override
+        void useSkill(String skill, Hero target) {
+            skills.get(skill).use(this, target);
+        }
+    }
+
+
+    static class FuneralFlowers extends Skill<Demon> {
+
+        FuneralFlowers() {
+            super(EPIC_BATTLE_FUNERAL_FLOWERS_SKILL, 2);
+        }
+
+        @Override
+        void effect(Demon user, Hero target) {
+            if (target.hp % 2 == 0) {
+                target.doDamage(3);
+            } else {
+                target.doDamage(1);
+            }
+        }
+    }
+
+    static class FateTrap extends Skill<Demon> {
+
+        FateTrap() {
+            super(EPIC_BATTLE_FATE_TRAP_SKILL, 5);
+        }
+
+        @Override
+        void effect(Demon user, Hero target) {
+            if (user.hp % 2 == 0) {
+                target.doDamage(4);
+            } else {
+                user.heal(4);
+            }
+        }
+    }
+
+
+    static class FireOrb extends Skill<Mage> {
+
+        FireOrb() {
+            super(EPIC_BATTLE_FIRE_ORB_SKILL, 2);
+        }
+
+        @Override
+        void effect(Mage user, Hero target) {
+            user.fire++;
+        }
+    }
+
+    static class IceOrb extends Skill<Mage> {
+
+        IceOrb() {
+            super(EPIC_BATTLE_ICE_ORB_SKILL, 3);
+        }
+
+        @Override
+        void effect(Mage user, Hero target) {
+            user.ice++;
+        }
+    }
+
     static class FuriousStrike extends Skill<Tiger> {
 
         FuriousStrike() {
@@ -142,11 +293,11 @@ class EpicBattlePlayer extends Player {
 
         @Override
         void effect(Tiger user, Hero target) {
+            target.doDamage(2);
             if (user.hp <= 6) {
                 user.heal(2);
             } else {
                 user.doDamage(2);
-                target.doDamage(2);
             }
         }
     }
@@ -172,6 +323,7 @@ class EpicBattlePlayer extends Player {
 
         @Override
         void effect(Huntress user, Hero target) {
+            user.magicArrowUsed = true;
             user.bonus++;
         }
     }
@@ -184,6 +336,7 @@ class EpicBattlePlayer extends Player {
 
         @Override
         void effect(Huntress user, Hero target) {
+            user.salvoUsed = true;
             target.doDamage((Game.RANDOM.nextInt(3) + 1) * (user.bonus + 1));
             user.bonus = 0;
         }

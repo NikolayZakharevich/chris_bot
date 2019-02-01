@@ -26,14 +26,23 @@ public class GameConstants {
     public final static String EPIC_BATTLE_NECROMANCER = "Некромант";
     public final static String EPIC_BATTLE_HUNTRESS = "Охотница";
     public final static String EPIC_BATTLE_TIGER = "Саблезуб";
+    public final static String EPIC_BATTLE_MAGE = "Маг";
+    public final static String EPIC_BATTLE_DEMON= "Демон";
 
 
     public final static String EPIC_BATTLE_PALADIN_ICON = "☀";
     public final static String EPIC_BATTLE_NECROMANCER_ICON = "&#128128;";
     public final static String EPIC_BATTLE_HUNTRESS_ICON = "&#127794;";
     public final static String EPIC_BATTLE_TIGER_ICON = "&#128005;";
+    public final static String EPIC_BATTLE_MAGE_ICON = "&#10024;";
+    public final static String EPIC_BATTLE_DEMON_ICON = "&#128293;";
     public final static String EPIC_BATTLE_MANA_ICON = "&#128167;";
     public final static String EPIC_BATTLE_HP_ICON = "&#10084;";
+    public final static String EPIC_BATTLE_SOUL_ICON = "&#128420;";
+    public final static String EPIC_BATTLE_FIRE_ICON = "&#128165;";
+    public final static String EPIC_BATTLE_ICE_ICON = "&#128142;";
+    public final static String EPIC_BATTLE_ARROW_ICON = "&#127993;";
+    public final static String EPIC_BATTLE_NECT_ACT_ICON = "&#128062;";
 
     public final static String EPIC_BATTLE_TAP_SKILL = "Тычок";
     public final static String EPIC_BATTLE_HUMMER_PUNCH_SKILL = "Удар молотом";
@@ -44,6 +53,10 @@ public class GameConstants {
     public final static String EPIC_BATTLE_SALVO_SKILL = "Залп";
     public final static String EPIC_BATTLE_FURIOUS_STRIKE_SKILL = "Яростный удар";
     public final static String EPIC_BATTLE_BEAST_SWIPE_SKILL = "Звериный размах";
+    public final static String EPIC_BATTLE_FIRE_ORB_SKILL = "Сфера огня";
+    public final static String EPIC_BATTLE_ICE_ORB_SKILL = "Сфера льда";
+    public final static String EPIC_BATTLE_FUNERAL_FLOWERS_SKILL = "Похоронные цветы";
+    public final static String EPIC_BATTLE_FATE_TRAP_SKILL = "Ловушка судьбы";
 
 
     public final static String ROCK_PAPER_SCISSORS_NAME = "Камень-ножницы-бумага";

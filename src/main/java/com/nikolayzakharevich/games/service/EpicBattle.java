@@ -12,7 +12,9 @@ import java.util.Map;
 
 class EpicBattle extends Game<EpicBattlePlayer> {
 
+    private Hero[] heroes = {new Paladin(), new Necromancer(), new Huntress(), new Tiger(), new Mage(), new Demon()};
     private EpicBattlePlayer otherPlayer = new EpicBattlePlayer(0);
+    private int step = 0;
 
     EpicBattle(int chatId) {
         super(EPIC_BATTLE_NAME, chatId);
@@ -45,68 +47,66 @@ class EpicBattle extends Game<EpicBattlePlayer> {
                 acceptChallenge(text);
                 break;
             case EPIC_BATTLE_ACT2_CONFIRM:
-                if (checkConfirmation(text)) {
-                    getRandomCurrentPlayer();
+                if (secondPlayerAccepted(text)) {
+                    setRandomCurrentPlayer();
                     heroPick(EPIC_BATTLE_ACT3_FIRST_HERO_PICK);
                 }
                 break;
             case EPIC_BATTLE_ACT3_FIRST_HERO_PICK:
                 setHero(currentPlayer, text);
-
-                EpicBattlePlayer temp = currentPlayer;
-                currentPlayer = otherPlayer;
-                otherPlayer = temp;
+                swapPlayers();
                 heroPick(EPIC_BATTLE_ACT4_SECOND_HERO_PICK);
                 break;
             case EPIC_BATTLE_ACT4_SECOND_HERO_PICK:
                 setHero(currentPlayer, text);
-
-                temp = currentPlayer;
-                currentPlayer = otherPlayer;
-                otherPlayer = temp;
-
-                int manaPoints = RANDOM.nextInt(6) + 1;
-                currentPlayer.hero.addMana(manaPoints);
-
-                message = getScoreMessage();
-                message += getFirstName(currentPlayer.vkId) + " бросает кубик. Выпало " + manaPoints + "\n" +
-                        "У вас " + currentPlayer.hero.mana + ",&#128167; выберите заклинание";
-
-                checkSkills(EPIC_BATTLE_ACT4_SECOND_HERO_PICK);
+                nextAct();
                 break;
             case EPIC_BATTLE_ACT_NEXT:
                 if (text.startsWith(EPIC_BATTLE_TAP_SKILL)) {
                     currentPlayer.hero.useTap(otherPlayer.hero);
                 }
-
-
+                currentPlayer.hero.endOfTurnEffect(otherPlayer.hero);
                 if (checkEnd()) {
                     return;
                 }
-
-                temp = currentPlayer;
-                currentPlayer = otherPlayer;
-                otherPlayer = temp;
-
-                manaPoints = RANDOM.nextInt(6) + 1;
-                currentPlayer.hero.addMana(manaPoints);
-
-                message = getScoreMessage();
-                message += getFirstName(currentPlayer.vkId) + " бросает кубик. Выпало " + manaPoints + "\n" +
-                        "У вас " + currentPlayer.hero.mana + " " + EPIC_BATTLE_MANA_ICON + ", выберите заклинание";
-                checkSkills(EPIC_BATTLE_ACT_NEXT);
+                nextAct();
                 break;
             case EPIC_BATTLE_ACT_CONTINUE:
                 currentPlayer.hero.useSkill(text.substring(0, text.indexOf(" (")), otherPlayer.hero);
                 if (checkEnd()) {
                     return;
                 }
-                message = getScoreMessage();
-                message += getFirstName(currentPlayer.vkId) + ", у вас осталось " + currentPlayer.hero.mana + " маны\n";
+                message = EpicBattleMessages.scoreMessage(currentPlayer, otherPlayer) + "\n" +
+                        EpicBattleMessages.manaInfo(currentPlayer);
                 checkSkills(EPIC_BATTLE_ACT_CONTINUE);
         }
 
 
+    }
+
+    private void nextAct() {
+        message = "";
+        if (!currentPlayer.hero.repeatTurn) {
+            swapPlayers();
+            step++;
+            if (step % 2 == 1) {
+                int roll = RANDOM.nextInt(6) + 1;
+                currentPlayer.hero.startOfTurnEffect(otherPlayer.hero);
+                otherPlayer.hero.startOfTurnEffect(currentPlayer.hero);
+                currentPlayer.hero.addMana(roll);
+                otherPlayer.hero.addMana(roll);
+                message = EpicBattleMessages.rollInfo(roll);
+            }
+        } else {
+            int roll = RANDOM.nextInt(6) + 1;
+            currentPlayer.hero.startOfTurnEffect(otherPlayer.hero);
+            currentPlayer.hero.addMana(roll);
+            message = EpicBattleMessages.rollInfo(roll);
+        }
+
+        message += EpicBattleMessages.scoreMessage(currentPlayer, otherPlayer) + "\n" +
+                EPIC_BATTLE_NECT_ACT_ICON + EpicBattleMessages.manaInfo(currentPlayer);
+        checkSkills(EPIC_BATTLE_ACT_NEXT);
     }
 
     private void checkSkills(String payload) {
@@ -131,18 +131,7 @@ class EpicBattle extends Game<EpicBattlePlayer> {
         keyboard = builder.build();
     }
 
-    private String getScoreMessage() {
-        if (currentPlayer.vkId < otherPlayer.vkId) {
-            return getFirstName(currentPlayer.vkId) + " (" + currentPlayer.hero.icon + ") " + EPIC_BATTLE_HP_ICON +
-                    currentPlayer.hero.hp + " - " + EPIC_BATTLE_HP_ICON + otherPlayer.hero.hp + " " +
-                    getFirstName(otherPlayer.vkId) + " (" + otherPlayer.hero.icon + ") " + "\n";
-        }
-        return getFirstName(otherPlayer.vkId) + " (" + otherPlayer.hero.icon + ") " + EPIC_BATTLE_HP_ICON +
-                otherPlayer.hero.hp + " - " + EPIC_BATTLE_HP_ICON + currentPlayer.hero.hp + " " +
-                getFirstName(currentPlayer.vkId) + " (" + currentPlayer.hero.icon + ") " + "\n";
-    }
-
-    private void getRandomCurrentPlayer() {
+    private void setRandomCurrentPlayer() {
         int seed = RANDOM.nextInt(2);
         if (seed == 0) {
             currentPlayer = players.get(0);
@@ -166,15 +155,15 @@ class EpicBattle extends Game<EpicBattlePlayer> {
                 .addButton(EPIC_BATTLE_REJECT, Color.RED, EPIC_BATTLE_ACT2_CONFIRM)
                 .setOneTime(true)
                 .build();
-        message = getFirstName(secondPlayerId) + ", принимаешь вызов?";
+        message = EpicBattleMessages.challenge(secondPlayerId);
     }
 
-    private boolean checkConfirmation(String text) {
+    private boolean secondPlayerAccepted(String text) {
         if (text.equalsIgnoreCase("го")) {
             return true;
         } else {
             isEnded = true;
-            message = getFirstName(currentPlayer.vkId) + " ссыкло(";
+            message = EpicBattleMessages.challengeReject(currentPlayer.vkId);
             keyboard = Keyboard.builder().build();
             return false;
         }
@@ -182,36 +171,19 @@ class EpicBattle extends Game<EpicBattlePlayer> {
 
     private void heroPick(String newPayload) {
 
-        message = "@id" + currentPlayer.vkId + "(" + getFirstName(currentPlayer.vkId) + "), ваш ход!\n" +
-                "Выберите героя!\n" +
-                EPIC_BATTLE_PALADIN + EPIC_BATTLE_PALADIN_ICON + "\n" +
-                "&#10084;20\n" +
-                "&#128167; (4) " + EPIC_BATTLE_HUMMER_PUNCH_SKILL + ": 3&#128481;\n" +
-                "&#128167; (6) " + EPIC_BATTLE_HOLY_LIGHT_SKILL + ": +5&#10084;\n\n" +
-                EPIC_BATTLE_NECROMANCER + EPIC_BATTLE_NECROMANCER_ICON + "\n" +
-                "&#10084;20\n" +
-                "&#128167; (3) " + EPIC_BATTLE_SOUL_STEALING_SKILL + ": 2&#128481;, + 1&#128420;(Нет максимума)\n" +
-                "&#128167; (6) " + EPIC_BATTLE_ASTRAL_EXPLOSION_SKILL + ": (2+&#128420;)&#128481;\n\n" +
-                EPIC_BATTLE_HUNTRESS + EPIC_BATTLE_HUNTRESS_ICON + "\n" +
-                "&#10084;20\n" +
-                "&#128167; (3) " + EPIC_BATTLE_MAGIC_ARROW_SKILL + ":+1&#128481; к атаке на ход\n" +
-                "&#128167; (6) " + EPIC_BATTLE_SALVO_SKILL + ": атака 1-2-3 раза\n\n" +
-                EPIC_BATTLE_TIGER + EPIC_BATTLE_TIGER_ICON + "\n" +
-                "&#10084;20\n" +
-                "&#128167; (3) " + EPIC_BATTLE_FURIOUS_STRIKE_SKILL + ": 2&#128481; &#10084;-2 если &#10084;>6, &#10084;+2, " +
-                "если &#10084;<=6\n" +
-                "&#128167; (6) " + EPIC_BATTLE_BEAST_SWIPE_SKILL + ": 50%&#128481; от &#10084; каждому герою\n\n";
+        message = EpicBattleMessages.heroList(currentPlayer);
+        Keyboard.Builder builder = Keyboard.builder();
+        for (Hero hero : heroes) {
+            builder.addButton(hero.name, Color.BLUE, newPayload)
+                    .newRow();
+        }
+        keyboard = builder.setOneTime(true).build();
+    }
 
-        keyboard = Keyboard.builder()
-                .addButton(EPIC_BATTLE_PALADIN, Color.WHITE, newPayload)
-                .newRow()
-                .addButton(EPIC_BATTLE_NECROMANCER, Color.BLUE, newPayload)
-                .newRow()
-                .addButton(EPIC_BATTLE_HUNTRESS, Color.GREEN, newPayload)
-                .newRow()
-                .addButton(EPIC_BATTLE_TIGER, Color.RED, newPayload)
-                .setOneTime(true)
-                .build();
+    private void swapPlayers() {
+        EpicBattlePlayer temp = currentPlayer;
+        currentPlayer = otherPlayer;
+        otherPlayer = temp;
     }
 
     private boolean checkEnd() {
@@ -219,32 +191,17 @@ class EpicBattle extends Game<EpicBattlePlayer> {
             return false;
         }
         keyboard = Keyboard.builder().build();
-        message = getScoreMessage();
-        if (currentPlayer.hero.isDead()) {
-            message += getFirstName(otherPlayer.vkId) + " " + getLastName(otherPlayer.vkId) + " - победитель";
-        } else if (otherPlayer.hero.isDead()) {
-            message += getFirstName(currentPlayer.vkId) + " " + getLastName(currentPlayer.vkId) + " - победитель";
-        } else {
-            message += "Победителей нет!";
-        }
+        message = EpicBattleMessages.scoreMessage(currentPlayer, otherPlayer) + "\n" +
+                EpicBattleMessages.gameResults(currentPlayer, otherPlayer);
         isEnded = true;
         return true;
     }
 
     private void setHero(EpicBattlePlayer player, String heroName) {
-        switch (heroName) {
-            case EPIC_BATTLE_PALADIN:
-                player.hero = new Paladin();
-                break;
-            case EPIC_BATTLE_NECROMANCER:
-                player.hero = new Necromancer();
-                break;
-            case EPIC_BATTLE_HUNTRESS:
-                player.hero = new Huntress();
-                break;
-            case EPIC_BATTLE_TIGER:
-                player.hero = new Tiger();
-                break;
+        for (Hero hero : heroes) {
+            if (heroName.equals(hero.name)) {
+                player.hero = hero;
+            }
         }
     }
 

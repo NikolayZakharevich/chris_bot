@@ -13,4 +13,6 @@ abstract class Player {
         vkId = currentPlayer.vkId;
         currentPlayer.vkId = temp;
     }
+
+
 }
