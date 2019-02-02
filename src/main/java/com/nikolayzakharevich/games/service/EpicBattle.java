@@ -128,7 +128,7 @@ class EpicBattle extends Game<EpicBattlePlayer> {
         } else {
             builder.addButton(EPIC_BATTLE_SKIP, Color.WHITE, EPIC_BATTLE_ACT_NEXT);
         }
-        keyboard = builder.build();
+        keyboard = builder.setOneTime(true).build();
     }
 
     private void setRandomCurrentPlayer() {

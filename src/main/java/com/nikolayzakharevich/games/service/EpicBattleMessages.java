@@ -11,7 +11,7 @@ public class EpicBattleMessages {
     }
 
     static String rollInfo(int roll) {
-        return  "Бросаем кубик.. Выпало " + roll + "\n";
+        return "Бросаем кубик.. Выпало " + roll + "\n";
     }
 
     static String challenge(int id) {
@@ -23,7 +23,7 @@ public class EpicBattleMessages {
     }
 
     static String heroList(EpicBattlePlayer player) {
-        return  EPIC_BATTLE_NECT_ACT_ICON + getFirstName(player.vkId) + ", ваш ход!\n" +
+        return EPIC_BATTLE_NECT_ACT_ICON + getFirstName(player.vkId) + ", ваш ход!\n" +
                 "Выберите героя!\n" +
                 EPIC_BATTLE_PALADIN + EPIC_BATTLE_PALADIN_ICON + "\n" +
                 "&#10084;20\n" +
@@ -42,7 +42,26 @@ public class EpicBattleMessages {
                 "&#10084;20\n" +
                 "&#128167; (3) " + EPIC_BATTLE_FURIOUS_STRIKE_SKILL + ": 2&#128481; " + EPIC_BATTLE_HP_ICON +
                 "-2 если &#10084;>6, " + EPIC_BATTLE_HP_ICON + " +2, если &#10084;<=6\n" +
-                "&#128167; (6) " + EPIC_BATTLE_BEAST_SWIPE_SKILL + ": 50%&#128481; от &#10084; каждому герою\n\n";
+                "&#128167; (6) " + EPIC_BATTLE_BEAST_SWIPE_SKILL + ": 50%&#128481; от &#10084; каждому герою\n\n" +
+                EPIC_BATTLE_MAGE + EPIC_BATTLE_MAGE_ICON + "\n" +
+                "&#10084;20\n" +
+                "&#128167; (2) " + EPIC_BATTLE_FIRE_ORB_SKILL + ": добавляет в заклинание сферу огня: " +
+                EPIC_BATTLE_FIRE_ICON + "\n" +
+                "&#128167; (3) " + EPIC_BATTLE_ICE_ORB_SKILL + ": добавляет в заклинание сферу льда: " +
+                EPIC_BATTLE_ICE_ICON + "\n" +
+                "&#128165; - 1-2&#128481;\n" +
+                "&#128142; - +1-3&#10084;\n" +
+                "&#128165; + &#128165; - 2-3&#128481;\n" +
+                "&#128165; + &#128142; - 1&#128481; + ход\n" +
+                "&#128165; + &#128165; + &#128165; - 3-4-5&#128481;\n" +
+                "&#128142; + &#128142; - 3-5&#10084;\n\n" +
+                EPIC_BATTLE_DEMON + EPIC_BATTLE_DEMON_ICON + "\n" +
+                "&#10084;20\n" +
+                "&#128167; (2) " + EPIC_BATTLE_FUNERAL_FLOWERS_SKILL + ": 1&#128481; или 3&#128481;," +
+                " если у противника чётное &#128481;\n" +
+                "&#128167; (5) " + EPIC_BATTLE_FATE_TRAP_SKILL + ": 4&#128481; если у демона чётное &#10084;\n" +
+                "+4 &#10084; если нечётное" + "\n\n";
+
     }
 
     static String gameResults(EpicBattlePlayer first, EpicBattlePlayer second) {

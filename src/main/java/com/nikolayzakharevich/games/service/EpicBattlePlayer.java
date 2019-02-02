@@ -197,7 +197,7 @@ class EpicBattlePlayer extends Player {
             if (fire == 1 && ice == 0) {
                 enemy.doDamage(Game.RANDOM.nextInt(2) + 1);
             } else if (fire == 0 && ice == 1) {
-                this.heal(Game.RANDOM.nextInt(2) + 2);
+                heal(Game.RANDOM.nextInt(2) + 2);
             } else if (fire == 2 && ice == 0) {
                 enemy.doDamage(Game.RANDOM.nextInt(2) + 2);
             } else if (fire == 1 && ice == 1) {
@@ -206,7 +206,7 @@ class EpicBattlePlayer extends Player {
             } else if (fire == 3 && ice == 0) {
                 enemy.doDamage(Game.RANDOM.nextInt(3) + 3);
             } else if (fire == 0 && ice == 2) {
-                enemy.heal(Game.RANDOM.nextInt(2) + 4);
+                heal(Game.RANDOM.nextInt(2) + 4);
             }
             ice = 0;
             fire = 0;
